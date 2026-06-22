@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>China Agricultural Chemical Pricing Intelligence - Enterprise Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Professional Agri Green Palette */
+            --primary-color: #114232;
+            --secondary-color: #2e7d5a;
+            --accent-color: #00ff7f;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --success-color: #10b981;
+            --light-bg: #f2f7f4;
+            --card-bg: #ffffff;
+            --border-color: #cde0d5;
+            --text-primary: #1f2937;
+            --text-secondary: #4b5563;
+            --text-light: #9ca3af;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f2f7f4 0%, #e2eee8 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ==================== HEADER ==================== */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 2rem 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-icon {
+            font-size: 2rem;
+        }
+
+        h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-subtitle {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        .header-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            opacity: 0.85;
+        }
+
+        .header-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* ==================== CONTAINER & LAYOUT ==================== */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* ==================== NAVIGATION TABS ==================== */
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(17, 66, 50, 0.08);
+            overflow-x: auto;
+            position: sticky;
+            top: calc(var(--header-height, 130px) + 1rem);
+            z-index: 90;
+            transition: top 0.3s ease;
+        }
+
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid transparent;
+            background: transparent;
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 0.95rem;
+        }
+
+        .nav-tab:hover {
+            background: var(--light-bg);
+            color: var(--primary-color);
+        }
+
+        .nav-tab.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* ==================== SECTION TOGGLE ==================== */
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ==================== CARDS ==================== */
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(17, 66, 50, 0.05);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        .card:hover {
+            box-shadow: 0 10px 25px rgba(17, 66, 50, 0.1);
+            border-color: var(--secondary-color);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-icon { font-size: 1.5rem; }
+
+        /* ==================== TABLES ==================== */
+        .table-responsive { overflow-x: auto; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+
+        th { padding: 1rem; text-align: left; font-weight: 600; letter-spacing: 0.3px; }
+        td { padding: 0.875rem 1rem; border-bottom: 1px solid var(--border-color); }
+        
+        tbody tr { transition: background-color 0.2s ease; }
+        tbody tr:hover { background-color: var(--light-bg); }
+        tbody tr:last-child td { border-bottom: none; }
+
+        .trend-up { color: var(--success-color); font-weight: 600; }
+        .trend-down { color: var(--danger-color); font-weight: 600; }
+        .trend-neutral { color: var(--text-secondary); font-weight: 600; }
+
+        /* ==================== BADGES & CHIPS ==================== */
+        .badge {
+            display: inline-block; padding: 0.35rem 0.75rem; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 600; white-space: nowrap;
+        }
+        .badge-success { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+        .badge-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger-color); }
+        .badge-warning { background: rgba(245, 158, 11, 0.1); color: #b45309; }
+        .badge-info { background: rgba(46, 125, 90, 0.1); color: var(--secondary-color); }
+
+        /* ==================== TOOLTIP ==================== */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            border-bottom: 1px dotted var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .tooltip-container .tooltip-text {
+            visibility: hidden;
+            width: 280px;
+            background-color: var(--primary-color);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 0.75rem;
+            position: absolute;
+            z-index: 10;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            font-weight: normal;
+            line-height: 1.4;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            pointer-events: none;
+        }
+
+        .tooltip-container .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--primary-color) transparent transparent transparent;
+        }
+
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* ==================== KPI CARDS & BLOCKS ==================== */
+        .kpi-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem; margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: linear-gradient(135deg, #ffffff 0%, var(--light-bg) 100%);
+            border: 2px solid var(--border-color); border-radius: 12px;
+            padding: 1.5rem; text-align: center; transition: all 0.3s ease;
+        }
+
+        .kpi-card:hover { border-color: var(--primary-color); box-shadow: 0 10px 25px rgba(17, 66, 50, 0.08); }
+        .kpi-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .kpi-value { font-size: 1.75rem; font-weight: 700; color: var(--primary-color); margin-bottom: 0.25rem; }
+        .kpi-label { font-size: 0.9rem; color: var(--text-secondary); font-weight: 600; }
+        .kpi-change { font-size: 0.85rem; margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border-color); }
+
+        .stat-block {
+            background: linear-gradient(135deg, rgba(17, 66, 50, 0.05) 0%, rgba(46, 125, 90, 0.05) 100%);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem 1.5rem; border-radius: 8px; margin-bottom: 1rem;
+        }
+        .stat-block strong { color: var(--primary-color); }
+
+        /* ==================== SEARCH & FILTERS ==================== */
+        .search-box {
+            display: flex; gap: 1rem; margin-bottom: 1.5rem; background: white;
+            padding: 1rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(17, 66, 50, 0.05);
+        }
+        .search-input {
+            flex: 1; padding: 0.75rem 1rem; border: 1px solid var(--border-color);
+            border-radius: 8px; font-size: 0.95rem; transition: all 0.3s ease;
+        }
+        .search-input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(17, 66, 50, 0.1); }
+        .filter-select {
+            padding: 0.75rem 1rem; border: 1px solid var(--border-color);
+            border-radius: 8px; background: white; font-size: 0.95rem; cursor: pointer;
+        }
+
+        /* ==================== ALERTS & RISKS ==================== */
+        .alert { padding: 1rem 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border-left: 4px solid; }
+        .alert-success { background: rgba(16, 185, 129, 0.1); border-color: var(--success-color); color: #065f46; }
+        .alert-danger { background: rgba(239, 68, 68, 0.1); border-color: var(--danger-color); color: #7f1d1d; }
+        .alert-warning { background: rgba(245, 158, 11, 0.1); border-color: var(--warning-color); color: #78350f; }
+        .alert-info { background: rgba(46, 125, 90, 0.1); border-color: var(--secondary-color); color: #0a3323; }
+        .alert strong { display: block; margin-bottom: 0.25rem; }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+
+        .risk-item {
+            background: white; border: 1px solid var(--border-color); border-left: 4px solid;
+            padding: 1.25rem; border-radius: 8px; margin-bottom: 1rem; transition: all 0.3s ease;
+        }
+        .risk-item:hover { box-shadow: 0 5px 15px rgba(17, 66, 50, 0.08); }
+        .risk-critical { border-left-color: var(--danger-color); background: rgba(239, 68, 68, 0.02); }
+        .risk-high { border-left-color: var(--warning-color); background: rgba(245, 158, 11, 0.02); }
+        .risk-medium { border-left-color: var(--secondary-color); background: rgba(46, 125, 90, 0.02); }
+
+        .risk-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+        .risk-title { font-weight: 700; color: var(--primary-color); font-size: 1rem; }
+        .risk-severity { font-size: 0.85rem; font-weight: 600; padding: 0.35rem 0.75rem; border-radius: 20px; }
+        .risk-critical .risk-severity { background: rgba(239, 68, 68, 0.15); color: var(--danger-color); }
+        .risk-high .risk-severity { background: rgba(245, 158, 11, 0.15); color: #b45309; }
+        .risk-medium .risk-severity { background: rgba(46, 125, 90, 0.15); color: var(--secondary-color); }
+
+        /* ==================== FOOTER ==================== */
+        .footer { background: var(--primary-color); color: white; padding: 2rem; margin-top: 3rem; text-align: center; font-size: 0.9rem; }
+        .footer-text { opacity: 0.9; margin-bottom: 0.5rem; }
+
+        @media (max-width: 768px) {
+            .header { padding: 1.5rem 1rem; }
+            h1 { font-size: 1.5rem; }
+            .container { padding: 1rem; }
+            .search-box { flex-direction: column; }
+            .nav-tabs { top: calc(var(--header-height, 150px) + 0.5rem); }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-content">
+            <div class="header-title">
+                <span class="header-icon">📊</span>
+                <div>
+                    <h1>China Agricultural Chemical Pricing Intelligence</h1>
+                    <div class="header-subtitle">Enterprise-Grade Dashboard & Sourcing Advisory</div>
+                </div>
+            </div>
+            <div class="header-meta">
+                <div class="header-meta-item">
+                    <span>📅 Last Updated:</span>
+                    <strong>22 Juni 2026</strong>
+                </div>
+                <div class="header-meta-item">
+                    <span>💱 Exchange Rate:</span>
+                    <strong>1 USD = 6.79 CNY</strong>
+                </div>
+                <div class="header-meta-item">
+                    <span>🛢️ Crude Oil:</span>
+                    <strong>$76.54/bbl </strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="container">
+        <!-- NAVIGATION TABS -->
+        <div class="nav-tabs" id="navTabs">
+            <button class="nav-tab active" onclick="switchSection('executive-summary', this)">📋 Executive Summary</button>
+            <button class="nav-tab" onclick="switchSection('herbicides', this)">🌿 Herbicides</button>
+            <button class="nav-tab" onclick="switchSection('insecticides', this)">🐛 Insecticides</button>
+            <button class="nav-tab" onclick="switchSection('fungicides', this)">🍄 Fungicides</button>
+            <button class="nav-tab" onclick="switchSection('biostimulants', this)">🧬 Biostimulants</button>
+            <button class="nav-tab" onclick="switchSection('price-drivers', this)">🔥 Price Drivers</button>
+            <button class="nav-tab" onclick="switchSection('risk-matrix', this)">⚠️ Risk Matrix</button>
+            <button class="nav-tab" onclick="switchSection('sourcing', this)">💡 Sourcing Strategy</button>
+            <button class="nav-tab" onclick="switchSection('equity', this)">📈 Equity Snapshot</button>
+            <button class="nav-tab" onclick="switchSection('policy', this)">🏛️ Registration & Policy</button>
+        </div>
+
+        <!-- ===== SECTION 1: EXECUTIVE SUMMARY ===== -->
+        <div id="executive-summary" class="section active">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><span class="card-icon">📊</span>Market Status & KPIs</div>
+                </div>
+
+                <div class="alert alert-warning">
+                    <strong>Composite Sentiment: DIVERGENT — Physical Firm, Equity De-rating</strong>
+                    Physical AI prices stable/rising but equity broadly de-rating. Xingfa +2.79% accumulasi vs Lier -4.71% (6th gap-down). Sector rotation, not exit. Dragon Boat Festival: markets closed Jun 23-28.
+                </div>
+
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon">💹</div>
+                        <div class="kpi-value">+10.16%</div>
+                        <div class="kpi-label">
+                            <div class="tooltip-container">
+                                Glyphosate YoY
+                                <span class="tooltip-text">Glyphosate is the market "bellwether" (indicator utama). Kenaikannya mencerminkan tren pemulihan/kenaikan harga di seluruh industri agrokimia.</span>
+                            </div>
+                        </div>
+                        <div class="kpi-change">Bellwether trending ⬆️</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon">📈</div>
+                        <div class="kpi-value">+41.67%</div>
+                        <div class="kpi-label">Chlorothalonil YoY</div>
+                        <div class="kpi-change">Strongest riser 🚀</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon">📉</div>
+                        <div class="kpi-value">-37%</div>
+                        <div class="kpi-label">Indoxacarb YoY</div>
+                        <div class="kpi-change">Biggest decline ⬇️</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon">⚡</div>
+                        <div class="kpi-value">+160%</div>
+                        <div class="kpi-label">Sulfur Cost (YTD)</div>
+                        <div class="kpi-change">Top price driver 🔥</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><span class="card-icon">🎯</span>Key Market Indicators</div>
+                </div>
+                
+                <div class="stat-block">
+                    <strong>📌 Top Price Driver:</strong> Sulfur cost surge (+160% YTD, ¥10,000-12,000/ton). US-Iran pact (Jun 16) memberikan normalisasi parsial dari ¥12-14K. Hormuz risk of re-closure remains.
+                </div>
+
+                <div class="stat-block">
+                    <strong>🛢️ Macro Context (Jun 19 US Close):</strong> WTI Crude $76.54 (+0.91%), VIX 16.78 (+2.32% — intraday reversal from 17.09). S&P 500 +1.08%. US markets risk-on: China agrochemical de-rating is China-specific (margin compression fears), not global risk-off.
+                </div>
+
+                <div class="stat-block">
+                    <strong>📊 Biggest Decliners:</strong> Indoxacarb (-37%), Metolachlor (-25%), and Lier Chemical (6th gap-down, -4.71% day, ¥12.94 — only 18.4% above ¥10.57 52W low).
+                </div>
+
+                <div class="stat-block">
+                    <strong>🚀 Growth Area:</strong> Biostimulants market valued at $231.57M-$249.58M. Humic acid +28.6% YoY leads all categories. CPEW 2026: China showcasing new proprietary CP compounds beyond generics.
+                </div>
+
+                <div class="stat-block">
+                    <strong>🏛️ SACA 2026 Key Takeaways:</strong> $170B tariff refund uncertainty; Off-patent wave confirmed (CTPR, cyantraniliprole, sulfoxaflor); 2,4-D dumping case >150% combined duties; Section 301 investigations ongoing.
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SECTION 2: HERBICIDES ===== -->
+        <div id="herbicides" class="section">
+            <div class="search-box">
+                <input type="text" class="search-input" id="herbicide-search" placeholder="Search herbicide by name..." onkeyup="filterTable('herbicide-table', 'herbicide-search')">
+                <select class="filter-select" id="herbicide-filter" onchange="filterTrend('herbicide-table', this.value)">
+                    <option value="">All Trends</option>
+                    <option value="up">Trending Up ⬆️</option>
+                    <option value="down">Trending Down ⬇️</option>
+                    <option value="stable">Stable →</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><span class="card-icon">🌿</span>Herbicide Prices & Trends (18 Products) — Jun 2026</div>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="herbicide-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Product</th>
+                                <th>RMB/ton</th>
+                                <th>USD/ton</th>
+                                <th>YoY</th>
+                                <th>Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td><strong>Glyphosate</strong></td><td>¥30,000–33,000</td><td>$4,431–4,874</td><td><span class="trend-up">+10.16%</span></td><td><span class="badge badge-success">⬆️ Rising</span></td></tr>
+                            <tr><td>2</td><td><strong>Glufosinate-ammonium</strong></td><td>¥50,000</td><td>$7,386</td><td><span class="trend-down">-10.08%</span></td><td><span class="badge badge-danger">⬇️ Falling</span></td></tr>
+                            <tr><td>3</td><td><strong>2,4-D</strong></td><td>¥17,000</td><td>$2,511</td><td><span class="trend-up">+10.69%</span></td><td><span class="badge badge-info">→ Flat</span></td></tr>
+                            <tr><td>4</td><td><strong>Clethodim</strong></td><td>¥80,000–85,000</td><td>$11,817–12,556</td><td>—</td><td><span class="badge badge-success">⬆️ Tight</span></td></tr>
+                            <tr><td>5</td><td><strong>Nicosulfuron</strong></td><td>Declining</td><td>—</td><td>—</td><td><span class="badge badge-danger">⬇️ Falling</span></td></tr>
+                            <tr><td>6</td><td><strong>Cyhalofop-butyl</strong></td><td>Declining</td><td>—</td><td>—</td><td><span class="badge badge-danger">⬇️ Falling</span></td></tr>
+                            <tr><td>7</td><td><strong>Bispyribac-sodium</strong></td><td>¥222,000</td><td>$32,818</td><td>—</td><td><span class="badge badge-danger">⬇️ Falling</span></td></tr>
+                            <tr><td>8</td><td><strong>Atrazine</strong></td><td>¥21,000</td><td>$3,102</td><td><span class="trend-down">-3.72%</span></td><td><span class="badge badge-warning">⬇️ Weak</span></td></tr>
+                            <tr><td>9</td><td><strong>Metolachlor</strong></td><td>¥24,500</td><td>$3,619</td><td><span class="trend-down">-23.29%</span></td><td><span class="badge badge-danger">⬇⬇️ Sharp decline</span></td></tr>
+                            <tr><td>10</td><td><strong>S-metolachlor</strong></td><td>¥24,500</td><td>$3,619</td><td><span class="trend-down">-25.24%</span></td><td><span class="badge badge-danger">⬇⬇️ Sharp decline</span></td></tr>
+                            <tr><td>11</td><td><strong>Pendimethalin</strong></td><td>¥42,100</td><td>$6,219</td><td><span class="trend-neutral">-0.71%</span></td><td><span class="badge badge-info">→ Stable</span></td></tr>
+                            <tr><td>12</td><td><strong>Trifluralin</strong></td><td>¥28,500</td><td>$4,201</td><td><span class="trend-up">+15.69%</span></td><td><span class="badge badge-success">⬆️ Up YoY</span></td></tr>
+                            <tr><td>13</td><td><strong>Diuron</strong></td><td>¥33,000</td><td>$4,875</td><td><span class="trend-down">-5.95%</span></td><td><span class="badge badge-danger">⬇️ Falling</span></td></tr>
+                            <tr><td>14</td><td><strong>Diquat</strong></td><td>¥16,800</td><td>$2,481</td><td><span class="trend-up">+16.56%</span></td><td><span class="badge badge-success">⬆️ Reversal</span></td></tr>
+                            <tr><td>15</td><td><strong>Mesotrione</strong></td><td>¥82,500</td><td>$12,187</td><td><span class="trend-down">-4.31%</span></td><td><span class="badge badge-info">→ Stable</span></td></tr>
+                            <tr><td>16</td><td><strong>Fomesafen</strong></td><td>¥112,000</td><td>$16,544</td><td><span class="trend-neutral">-1.15%</span></td><td><span class="badge badge-info">→ Stable</span></td></tr>
+                            <tr><td>17</td><td><strong>Oxyfluorfen</strong></td><td>¥136,000</td><td>$20,094</td><td><span class="trend-up">+2.20%</span></td><td><span class="badge badge-success">⬆️ Slight</span></td></tr>
+                            <tr style="background-color: rgba(239, 68, 68, 0.05);">
+                                <td>18</td>
+                                <td><strong>Topramezone</strong></td>
+                                <td>&lt;480,000</td>
+                                <td>&lt;$70,750</td>
+                                <td><span class="trend-down">-65%+ est.</span></td>
+                                <td><span class="badge badge-danger">⬇⬇️ Patent cliff</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><span class="card-icon">🔍</span>Key Insights - Herbicides (Jun 2026)</div>
+                </div>
+
+                <div class="alert alert-danger">
+                    <strong>⚠️ Topramezone "Patent Cliff":</strong> Harga runtuh dari $200/kg (2024) menjadi &lt;$71/kg di 2026. Erosi margin pasca-paten menjadi risiko struktural nyata bagi molekul AI generik lainnya. Jangan kunci kontrak jangka panjang pada AI yang patennya segera habis.
+                </div>
+
+                <div class="stat-block">
+                    <strong>🎯 Glyphosate Bellwether:</strong> ¥30,000–33,000 (+10.16% YoY). Validasi penembusan batas ¥30,000 akibat kenaikan PMIDA +20% (imbas blokade Selat Hormuz). Cost floor estimasi ¥28,000–29,000/ton.
+                </div>
+
+                <div class="stat-block">
+                    <strong>📉 Metolachlor & Glufosinate:</strong> Kombinasi overcapacity besar dan regulasi standar klorin baru terus menekan harga. VAT rebate glufosinate dicabut 1 Apr 2026.
+                </div>
+
+                <div class="stat-block">
+                    <strong>📋 New additions (v2.3→v2.4):</strong> Nicosulfuron, Cyhalofop-butyl, Bispyribac-sodium, Diuron, Mesotrione, Fomesafen, Oxyfluorfen — semuanya falling/stable dari data ABG & CCPIA.
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SECTION 3: INSECTICIDES ===== -->
+        <div id="insecticides" class="section">
+            <div class="search-box">
+                <input type="text" class="search-input" id="insecticide-search" placeholder="Search insecticide by name..." onkeyup="filterTable('insecticide-table', 'insecticide-search')">
+                <select class="filter-select" id="insecticide-filter" onchange="filterTrend('insecticide-table', this.value)">
+                    <option value="">All Trends</option>
+                    <option value="up">Trending Up ⬆️</option>
+                    <option value="down">Trending Down ⬇️</option>
+                    <option value="stable">Stable →</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><span class="card-icon">🐛</span>Insecticide Prices & Trends (14 Products) — Jun 2026</div>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="insecticide-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Product</th>
+                                <th>RMB/ton</th>
+                                <th>USD/ton</th>
+                                <th>YoY</th>
+                                <th>Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td><strong>Chlorantraniliprole (CTPR)</strong></td><td>¥188,000–245,000</td><td>$27,770–36,190</td><td><span class="trend-down">-4.59%</span></td><td><span class="badge badge-warning">→ Volatile</span></td></tr>
+                            <tr><td>2</td><td><strong>Abamectin</strong></td><td>¥425,000–430,000</td><td>$62,778–63,516</td><td><span class="trend-up">+10.11%</span></td><td><span class="badge badge-success">⬆️ Rising</span></td></tr>
+                            <tr><td>3</td><td><strong>Emamectin benzoate 95% TC</strong></td><td>~¥550,000</td><td>~$81,242</td><td>—</td><td><span class="badge badge-info">→ Stable</span></td></tr>
+                            <tr><td>4</td><td><strong>Indoxacarb</strong></td><td>¥460,000–500,000</td><td>$67,948–73,857</td><td><span class="trend-down">-37%</span></td><td><span class="badge badge-danger">⬇⬇️ Collapsed</span></td></tr>
+                            <tr><td>5</td><td><strong>Imidacloprid</strong></td><td>¥65,000–75,500</td><td>$9,602–11,152</td><td><span class="trend-up">+12% est.</span></td><td><span class="badge badge-danger">⬇️ Starting to fall</span></td></tr>
+                            <tr><td>6</td><td><strong>Thiamethoxam</strong></td><td>¥50,000–56,000</td><td>$7,386–8,272</td><td><span class="trend-down">-9.28%</span></td><td><span class="badge badge-danger">⬇⬇️ Sharp decline</span></td></tr>
+                            <tr><td>7</td><td><strong>Cartap</strong></td><td>¥98,000</td><td>$14,477</td><td><span class="trend-up">+19.44%</span></td><td><span class="badge badge-success">⬆️ Rising</span></td></tr>
+                            <tr><td>8</td><td><strong>Chlorpyrifos 95% TC</strong></td><td>~¥55,000</td><td>~$8,125</td><td>—</td><td><span class="badge badge-warning">⚠️ ICAMA restriction Aug'26</span></td></tr>
+                            <tr><td>9</td><td><strong>Lambda-cyhalothrin</strong></td><td>Firm</td><td>—</td><td><span class="trend-neutral">—</span></td><td><span class="badge badge-info">→ Stable</span></td></tr>
+                            <tr><td>10</td><td><strong>Bifenthrin</strong></td><td>¥130,000</td><td>$19,205</td><td>—</td><td><span class="badge badge-info">→ Stable</span></td></tr>
+                            <tr><td>11</td><td><strong>Nitenpyram</strong></td><td>¥118,000</td><td>$17,432</td><td><span class="trend-down">-5.60%</span></td><td><span class="badge badge-danger">⬇️ Falling</span></td></tr>
+                            <tr><td>12</td><td><strong>Spirotetramat</strong></td><td>¥355,000</td><td>$52,439</td><td><span class="trend-down">-16.92%</span></td><td><span class="badge badge-danger">⬇️ Post-patent pressure</span></td></tr>
+                            <tr><td>13</td><td><strong>Malathion</strong></td><td>¥29,000</td><td>$4,284</td><td><span class="trend-down">-5.15%</span></td><td><span class="badge badge-danger">⬇️ Falling</span></td></tr>
+                            <tr><td>14</td><td><strong>Pymetrozine</strong></td><td>¥106,000</td><td>$15,659</td><td>—</td><td><span class="badge badge-danger">⬇️ Falling</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><span class="card-icon">⚡</span>Key Insights - Insecticides (Jun 2026)</div>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>🔄 CTPR Volatility Update:</strong> Lonjakan harga awal tahun (+50%) terbukti **sementara, bukan struktural**. Harga CTPR memuncak di $44/kg pasca-ledakan Youdao, namun telah kembali normal ke level ¥188,000–245,000 ($33/kg). Pemulihan rantai pasok K-amine lebih cepat dari perkiraan. SACA 2026 konfirmasi off-patent wave: generik CTPR akan semakin menekan harga H2 2026.
+                </div>
+
+                <div class="stat-block">
+                    <strong>📉 Indoxacarb Collapse:</strong> -37% YoY = penurunan harga terdalam. 2-3 produsen baru masuk 2026 — kelebihan kapasitas akut.
+                </div>
+
+                <div class="stat-block">
+                    <strong>🧬 Imidacloprid (+12% YoY, mulai turun):</strong> ¥65,000–75,500. Masih +12% YoY karena cost push, namun tren terbaru mulai falling akibat kompetisi generik.
+                </div>
+
+                <div class="stat-block">
+                    <strong>📋 New additions (v2.3→v2.4):</strong> Imidacloprid, Lambda-cyhalothrin, Bifenthrin, Spirotetramat, Malathion, Pymetrozine — cakupan pasar lebih lengkap.
+                </div>
+
+                <div class="alert alert-danger">
+                    <strong>🎯 Action Required:</strong> Pre-position Chlorpyrifos stock before ICAMA export restriction (August 1, 2026).
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SECTION 4: FUNGICIDES ===== -->
+        <div id="fungicides" class="section">
+            <div class="search-box">
+                <input type="text" class="search-input" id="fungicide-search" placeholder="Search fungicide by name..." onkeyup="filterTable('fungicide-table', 'fungicide-search')">
+                <select class="filter-select" id="fungicide-filter" onchange="filterTrend('fungicide-table', this.value)">
+                    <option value="">All Trends</option>
+                    <option value="up">Trending Up ⬆️</option>
+                    <option value="down">Trending Down ⬇️</option>
+                    <option value="stable">Stable →</option>
+                </select>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><span class="card-icon">🍄</span>Fungicide Prices & Trends (13 Products) — Jun 2026</div>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="fungicide-table">
+                        <thead>
+                            <tr><th>#</th><th>Product</th><th>RMB/ton</th><th>USD/ton</th><th>YoY</th><th>Trend</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td><strong>Chlorothalonil</strong></td><td>Firm/rising</td><td>—</td><td><span class="trend-up">+41.67%</span></td><td><span class="badge badge-success">⬆⬆️ Strongest riser</span></td></tr>
+                            <tr><td>2</td><td><strong>Mancozeb 80% WP</strong></td><td>~¥28,000</td><td>~$4,136</td><td><span class="trend-up">+8%</span></td><td><span class="badge badge-success">⬆️ Slight</span></td></tr>
+                            <tr><td>3</td><td><strong>Tebuconazole</strong></td><td>~¥50,000</td><td>$7,386</td><td><span class="trend-up">+11.32%</span></td><td><span class="badge badge-success">⬆️ Rising</span></td></tr>
+                            <tr><td>4</td><td><strong>Carbendazim</strong></td><td>~¥36,000</td><td>$5,318</td><td><span class="trend-up">+10.16%</span></td><td><span class="badge badge-success">⬆️ Rising</span></td></tr>
+                            <tr><td>5</td><td><strong>Metalaxyl</strong></td><td>¥100,000</td><td>$14,772</td><td><span class="trend-up">+3.19%</span></td><td><span class="badge badge-info">→ Stable</span></td></tr>
+                            <tr><td>6</td><td><strong>Azoxystrobin</strong></td><td>¥134,000</td><td>$19,793</td><td><span class="trend-down">-5.32%</span></td><td><span class="badge badge-danger">⬇️ Falling</span></td></tr>
+                            <tr><td>7</td><td><strong>Difenoconazole</strong></td><td>Rising</td><td>—</td><td><span class="trend-up">+5% est.</span></td><td><span class="badge badge-success">⬆️ Rising</span></td></tr>
+                            <tr><td>8</td><td><strong>Prothioconazole</strong></td><td>¥116,000</td><td>$17,136</td><td>—</td><td><span class="badge badge-danger">⬇️ New capacity pressure</span></td></tr>
+                            <tr><td>9</td><td><strong>Boscalid</strong></td><td>¥270,000</td><td>$39,883</td><td>—</td><td><span class="badge badge-danger">⬇️ Weakening</span></td></tr>
+                            <tr><td>10</td><td><strong>Epoxiconazole</strong></td><td>¥245,000</td><td>$36,192</td><td>—</td><td><span class="badge badge-danger">⬇️ Falling</span></td></tr>
+                            <tr><td>11</td><td><strong>Flusilazole</strong></td><td>¥300,000</td><td>$44,316</td><td>—</td><td><span class="badge badge-danger">⬇️ Falling</span></td></tr>
+                            <tr><td>12</td><td><strong>Prochloraz</strong></td><td>¥49,000</td><td>$7,239</td><td>—</td><td><span class="badge badge-danger">⬇️ Falling</span></td></tr>
+                            <tr><td>13</td><td><strong>Trifloxystrobin</strong></td><td>~¥280,000</td><td>~$41,359</td><td>—</td><td><span class="badge badge-danger">⬇️ Falling</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header"><div class="card-title"><span class="card-icon">🌟</span>Key Insights - Fungicides (Jun 2026)</div></div>
+                <div class="stat-block"><strong>🏆 Chlorothalonil Champion:</strong> +41.67% YoY = terkuat dari semua kategori pestisida akibat pasokan ketat dan registrasi baru terbatas.</div>
+                <div class="stat-block"><strong>🌍 Mancozeb:</strong> ~¥28,000/ton (+8% YoY) — permintaan Amerika Selatan kuat, pasokan spot tipis.</div>
+                <div class="stat-block"><strong>📉 Azoxystrobin turun:</strong> -5.32% YoY tertekan >30 produsen generik. Tren falling diperkirakan berlanjut.</div>
+                <div class="stat-block"><strong>📋 New additions (v2.3→v2.4):</strong> Metalaxyl, Difenoconazole (~¥145K, +5%, stabil), Boscalid, Epoxiconazole, Flusilazole, Prochloraz, Trifloxystrobin (~¥280K) — 7 produk baru dari data CCPIA.</div>
+            </div>
+        </div>
+
+        <!-- ===== SECTION 5: BIOSTIMULANTS ===== -->
+        <div id="biostimulants" class="section">
+            <div class="card">
+                <div class="card-header"><div class="card-title"><span class="card-icon">🧬</span>Biostimulant Market — Jun 2026 (10 Categories)</div></div>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon">💰</div>
+                        <div class="kpi-value">$249M</div>
+                        <div class="kpi-label">Estimated Market Size</div>
+                        <div class="kpi-change">~10.3% CAGR (Seaweed)</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon">🚀</div>
+                        <div class="kpi-value">20–40%</div>
+                        <div class="kpi-label">China Discount vs MNC</div>
+                        <div class="kpi-change">Competitive advantage</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon">⚠️</div>
+                        <div class="kpi-value">15–25%</div>
+                        <div class="kpi-label">Quality Variability</div>
+                        <div class="kpi-change">Strict QC required</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><div class="card-title"><span class="card-icon">🌍</span>Key Industry Breakthroughs</div></div>
+                <div class="grid-2">
+                    <div class="stat-block">
+                        <strong>🌿 Lomon Bio (BIMIE):</strong> World's first registered biological miticide (Apr 2026).
+                    </div>
+                    <div class="stat-block">
+                        <strong>🧄 Chengdu Newsun (Allicin):</strong> Garlic-based biofungicide scaling into SE Asia (Vietnam).
+                    </div>
+                    <div class="stat-block">
+                        <strong>🤝 Biotalys + Syngenta:</strong> AGROBODY bioinsecticide partnership validates novel bioactive protein platform.
+                    </div>
+                    <div class="stat-block">
+                        <strong>🇺🇸 Rovensa Next + Novonesis:</strong> TYPHOON + GALACTEK launch in North America.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header"><div class="card-title"><span class="card-icon">💸</span>Estimated FOB Prices (China) — All 10 Categories per CCPIA</div></div>
+                <div class="table-responsive">
+                    <table>
+                        <thead><tr><th>Category</th><th>RMB/ton</th><th>USD/ton</th><th>YoY</th><th>Trend</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Seaweed Extract Liquid</strong></td><td>¥10,000</td><td>$1,474</td><td><span class="trend-up">+15.3%</span></td><td><br><span style="font-size:0.75rem;color:#9ca3af;">(Industry estimate)</span></td></tr>
+                            <tr><td><strong>Seaweed Extract Powder</strong></td><td>¥14,200</td><td>$2,093</td><td><span class="trend-up">+15.3%</span></td><td><br><span style="font-size:0.75rem;color:#9ca3af;">(Industry estimate)</span></td></tr>
+                            <tr><td><strong>Humic Acid Powder</strong></td><td>¥4,600</td><td>$678</td><td><span class="trend-up">+28.6%</span></td><td><br><span style="font-size:0.75rem;color:#9ca3af;">(Industry estimate)</span></td></tr>
+                            <tr><td><strong>Amino Acid Liquid</strong></td><td>¥7,500</td><td>$1,105</td><td><span class="trend-up">+20.0%</span></td><td><br><span style="font-size:0.75rem;color:#9ca3af;">(Industry estimate)</span></td></tr>
+                            <tr><td><strong>Amino Acid Powder</strong></td><td>¥10,500</td><td>$1,547</td><td><span class="trend-up">+20.0%</span></td><td><br><span style="font-size:0.75rem;color:#9ca3af;">(Industry estimate)</span></td></tr>
+                            <tr><td><strong>Microbial Product Liquid</strong></td><td>¥18,000</td><td>$2,653</td><td><span class="trend-up">+16.7%</span></td><td><br><span style="font-size:0.75rem;color:#9ca3af;">(Industry estimate)</span></td></tr>
+                            <tr><td><strong>Microbial Product Powder</strong></td><td>¥23,500</td><td>$3,464</td><td><span class="trend-up">+16.7%</span></td><td><br><span style="font-size:0.75rem;color:#9ca3af;">(Industry estimate)</span></td></tr>
+                            <tr><td><strong>Fish Protein Liquid</strong></td><td>¥13,200</td><td>$1,946</td><td><span class="trend-up">+8.3%</span></td><td><br><span style="font-size:0.75rem;color:#9ca3af;">(Industry estimate)</span></td></tr>
+                            <tr><td><strong>Chitosan Powder</strong></td><td>¥37,500</td><td>$5,527</td><td><span class="trend-up">+5.7%</span></td><td><br><span style="font-size:0.75rem;color:#9ca3af;">(Industry estimate)</span></td></tr>
+                            <tr><td><strong>Fulvic Acid Liquid</strong></td><td>¥11,200</td><td>$1,651</td><td><span class="trend-up">+10.0%</span></td><td><br><span style="font-size:0.75rem;color:#9ca3af;">(Industry estimate)</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SECTION 6: PRICE DRIVERS ===== -->
+        <div id="price-drivers" class="section">
+            <div class="card">
+                <div class="card-header"><div class="card-title"><span class="card-icon">🔥</span>Top Price Drivers Ranked (Jun 2026)</div></div>
+
+                <div class="risk-item risk-critical">
+                    <div class="risk-header">
+                        <div class="risk-title">#1: Sulfur Cost Explosion (+160% YTD)</div>
+                        <span class="risk-severity">CRITICAL</span>
+                    </div>
+                    <div style="font-size: 0.95rem; color: var(--text-secondary);">
+                        Mencapai ¥10,000–12,000/ton. Sempat panic ke ¥12-14K, namun US-Iran pact (16 Jun) menormalkan ke ¥10-12K. Risiko penutupan kembali masih ada. Dampak hilir besar untuk Glyphosate dan fungisida berbasis sulfur.
+                    </div>
+                </div>
+
+                <div class="risk-item risk-high">
+                    <div class="risk-header">
+                        <div class="risk-title">#2: SACA 2026 — Off-Patent Wave & Tariff Uncertainty</div>
+                        <span class="risk-severity">HIGH</span>
+                    </div>
+                    <div style="font-size: 0.95rem; color: var(--text-secondary);">
+                        Konfirmasi gelombang off-patent: CTPR, cyantraniliprole, sulfoxaflor. $170B tarif berpotensi direfund (7% interest). Section 301 investigations ongoing. 2,4-D dumping case >150% combined duties. Ketidakpastian perdagangan membayangi.
+                    </div>
+                </div>
+
+                <div class="risk-item risk-high">
+                    <div class="risk-header">
+                        <div class="risk-title">#3: "Three Illegals" Crackdown & Compliance</div>
+                        <span class="risk-severity">HIGH</span>
+                    </div>
+                    <div style="font-size: 0.95rem; color: var(--text-secondary);">
+                        Kampanye lingkungan dan "Satu Produk Satu Sertifikat" memaksa produsen kecil non-kepatuhan keluar pasar. Mendorong konsolidasi dan basis biaya (cost floor) yang lebih tinggi. CCPIA merilis peringkat perusahaan formulasi.
+                    </div>
+                </div>
+
+                <div class="risk-item risk-medium">
+                    <div class="risk-header">
+                        <div class="risk-title">#4: Middle East / Strait of Hormuz Blockade</div>
+                        <span class="risk-severity">MEDIUM</span>
+                    </div>
+                    <div style="font-size: 0.95rem; color: var(--text-secondary);">
+                        US-Iran pact (16 Jun) memberikan normalisasi parsial, namun risiko re-eskalasi tetap tinggi. Gangguan jalur pelayaran memicu krisis pasokan Metanol → PMIDA +20%, menekan biaya produksi Glyphosate.
+                    </div>
+                </div>
+
+                <div class="risk-item risk-medium">
+                    <div class="risk-header">
+                        <div class="risk-title">#5: Lier Chemical — 6th Gap-Down Streak</div>
+                        <span class="risk-severity">MEDIUM</span>
+                    </div>
+                    <div style="font-size: 0.95rem; color: var(--text-secondary);">
+                        Yakinkan bahwa rotasi sektor adalah intra-sektor (dari single-molecule ke integrated players). Jika ¥10.57 52W low tembus = kepanikan sektor agrokimia China secara luas.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SECTION 7: RISK MATRIX ===== -->
+        <div id="risk-matrix" class="section">
+            <div class="card">
+                <div class="card-header"><div class="card-title"><span class="card-icon">⚠️</span>Supply Chain Risk Matrix</div></div>
+
+                <div class="alert alert-danger"><strong>TIER 1 - CRITICAL (Action Immediately)</strong></div>
+
+                <div class="risk-item risk-critical">
+                    <div class="risk-header">
+                        <div class="risk-title">Chlorpyrifos ICAMA Export Restriction (Aug 2026)</div>
+                        <span class="risk-severity">Score: 9/10</span>
+                    </div>
+                    <div style="background: rgba(239, 68, 68, 0.05); padding: 1rem; border-radius: 6px; margin-top: 0.5rem;">
+                        <strong>🎯 Mitigation:</strong> Pre-position 6-month stock sebelum tenggat 1 Agustus. Konfirmasi ketersediaan dengan pemasok segera.
+                    </div>
+                </div>
+
+                <div class="risk-item risk-critical">
+                    <div class="risk-header">
+                        <div class="risk-title">Sustained High Sulfur Prices</div>
+                        <span class="risk-severity">Score: 9/10</span>
+                    </div>
+                    <div style="background: rgba(239, 68, 68, 0.05); padding: 1rem; border-radius: 6px; margin-top: 0.5rem;">
+                        <strong>🎯 Mitigation:</strong> Amankan kontrak jangka panjang (18-24 bulan) atau lindung nilai (hedge). US-Iran pact (16 Jun) memberikan normalisasi parsial ke ¥10-12K dari ¥12-14K, namun risiko re-eskalasi tetap.
+                    </div>
+                </div>
+
+                <div class="risk-item risk-critical">
+                    <div class="risk-header">
+                        <div class="risk-title">Lier Chemical — 6th Consecutive Gap-Down</div>
+                        <span class="risk-severity">Score: 8/10</span>
+                    </div>
+                    <div style="background: rgba(239, 68, 68, 0.05); padding: 1rem; border-radius: 6px; margin-top: 0.5rem;">
+                        <strong>🎯 Mitigation:</strong> Hindari eksposur sampai stabil. Pantau level ¥10.57 (52W low). Jika tembus, bersiap untuk kepanikan sektor. Rotasi ke produsen terintegrasi seperti Hubei Xingfa.
+                    </div>
+                </div>
+
+                <div class="alert alert-warning" style="margin-top: 1.5rem;"><strong>TIER 2 - HIGH (Action Within 3 Months)</strong></div>
+
+                <div class="risk-item risk-high">
+                    <div class="risk-header">
+                        <div class="risk-title">Chlorothalonil Supply Crisis</div>
+                        <span class="risk-severity">Score: 8/10</span>
+                    </div>
+                    <div style="background: rgba(245, 158, 11, 0.05); padding: 1rem; border-radius: 6px; margin-top: 0.5rem;">
+                        <strong>🎯 Mitigation:</strong> Siapkan program substitusi produk menggunakan Mancozeb (biaya lebih rendah) atau Azoxystrobin.
+                    </div>
+                </div>
+
+                <div class="risk-item risk-high">
+                    <div class="risk-header">
+                        <div class="risk-title">SACA 2026 Trade Uncertainty — $170B Tariffs & Section 301</div>
+                        <span class="risk-severity">Score: 7/10</span>
+                    </div>
+                    <div style="background: rgba(245, 158, 11, 0.05); padding: 1rem; border-radius: 6px; margin-top: 0.5rem;">
+                        <strong>🎯 Mitigation:</strong> Pantau keputusan pengadilan AS tentang refund tarif. Diversifikasi basis pelanggan ke non-AS. Siapkan dokumentasi kepatuhan untuk Section 301.
+                    </div>
+                </div>
+
+                <div class="alert alert-info" style="margin-top: 1.5rem;"><strong>DOWNGRADED RISKS</strong></div>
+
+                <div class="risk-item risk-medium">
+                    <div class="risk-header">
+                        <div class="risk-title">CTPR Supply Disruption</div>
+                        <span class="risk-severity">Score: 5/10 ⬇️</span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                        Risiko diturunkan karena pasokan paska-ledakan telah kembali normal ke harga ¥188,000-245,000. Cukup pertahankan safety stock 45-hari. Namun perhatikan ekspansi generik di H2 2026 yang dapat menekan harga lebih lanjut.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SECTION 8: SOURCING STRATEGY ===== -->
+        <div id="sourcing" class="section">
+            <div class="card">
+                <div class="card-header"><div class="card-title"><span class="card-icon">💡</span>Strategic Advisory</div></div>
+                <div class="alert alert-info">
+                    <strong>Pro Tip:</strong> 5 Praktik Terbaik Pengadaan di Kuartal 3 2026
+                </div>
+                
+                <div class="stat-block">
+                    <strong>1. Manfaatkan "Off-Season Lull" (Jun-Agu):</strong> Permintaan domestik China turun 30-40% di musim panas. Ini menciptakan "Jendela Sourcing Strategis" dimana pabrik butuh pesanan ekspor. Manfaatkan untuk nego diskon.
+                </div>
+                <div class="stat-block">
+                    <strong>2. Kelola Biaya Bahan Baku Langsung:</strong> Fokus negosiasi di hulu (metanol, etilen, sulfur) daripada sekadar menawar harga produk jadi.
+                </div>
+                <div class="stat-block">
+                    <strong>3. Hindari AI Mendekati Habis Paten:</strong> Awas jebakan "Patent Cliff" seperti kasus Topramezone. Harga produk yang baru off-patent akan segera hancur.
+                </div>
+                <div class="stat-block">
+                    <strong>4. Perpanjang Lead Time:</strong> Beri bantalan ekstra 30 hari untuk mengantisipasi disrupsi rute pengiriman Timur Tengah.
+                </div>
+                <div class="stat-block">
+                    <strong>5. Kemitraan Pabrik Lokal (JV):</strong> Mulai evaluasi Toll Manufacturing di India atau Indonesia untuk memitigasi risiko volatilitas impor dari China.
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SECTION 9: EQUITY ANALYSIS ===== -->
+        <div id="equity" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><span class="card-icon">📈</span>Equity Snapshot — 22 Juni 2026 (Last Session Before Dragon Boat Festival)</div>
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Company</th><th>Ticker</th><th>Price (¥)</th><th>Day Chg</th><th>Vol vs Avg</th><th>P/E</th><th>EPS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Hubei Xingfa</strong></td>
+                                <td>600141.SS</td>
+                                <td><strong>¥38.65</strong></td>
+                                <td><span class="trend-up">+2.79%</span> 🟢</td>
+                                <td><span class="badge badge-warning">2.18x</span></td>
+                                <td>29.22</td>
+                                <td>1.26</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Nantong Jiangshan</strong></td>
+                                <td>600389.SS</td>
+                                <td><strong>¥21.80</strong></td>
+                                <td><span class="trend-down">-4.01%</span></td>
+                                <td><span class="badge badge-info">1.09x</span></td>
+                                <td>18.24</td>
+                                <td>1.30</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Jiangsu Yangnong</strong></td>
+                                <td>600486.SS</td>
+                                <td><strong>¥53.91</strong></td>
+                                <td><span class="trend-down">-2.48%</span></td>
+                                <td><span class="badge badge-success">0.92x</span></td>
+                                <td>18.27</td>
+                                <td>3.12</td>
+                            </tr>
+                            <tr style="background-color: rgba(239, 68, 68, 0.05);">
+                                <td><strong>Lier Chemical</strong></td>
+                                <td>002258.SZ</td>
+                                <td><strong>¥12.94</strong></td>
+                                <td><span class="trend-down">-4.71%</span> 🔴</td>
+                                <td><span class="badge badge-warning">1.93x</span></td>
+                                <td>N/A</td>
+                                <td><span class="trend-down">-7.88% gap</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>ADAMA Ltd.</strong></td>
+                                <td>000553.SZ</td>
+                                <td><strong>¥5.78</strong></td>
+                                <td><span class="trend-down">-1.70%</span></td>
+                                <td><span class="badge badge-info">0.48x</span></td>
+                                <td>N/A</td>
+                                <td><span class="trend-down">-0.27</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><div class="card-title"><span class="card-icon">📊</span>Equity Sentiment Analysis (PM Session)</div></div>
+                
+                <div class="stat-block">
+                    <strong>🟢 XINGFA ACCUMULATION:</strong> +2.79% pada volume 2.18x rata-rata. Aliran dana institusi masuk saat Hubei Xingfa diuntungkan integrasi aset sulfur vertikal — katalis utama di tengah krisis biaya bahan baku.
+                </div>
+
+                <div class="stat-block">
+                    <strong>🔴 LIER CHEMICAL — 6th Gap-Down Beruntun:</strong> Dibuka ¥12.51 (-7.88% gap), volume 1.93x rata-rata. Hanya 18.4% di atas 52W low ¥10.57. Tanda bahaya: jika tembus ¥10.57 = kepanikan sektor. Hindari eksposur sampai stabil.
+                </div>
+
+                <div class="stat-block">
+                    <strong>📉 Sector Divergence:</strong> Xingfa acumulasi vs Lier outflow = rotasi institusi DALAM sektor, bukan keluar. Produsen terintegrasi/diversifikasi diunggulkan dibanding eksposur molekul tunggal.
+                </div>
+
+                <div class="stat-block">
+                    <strong>⚠️ ADAMA Lagging:</strong> ¥5.78 (-1.70%), volume 0.48x — sangat tipis. EPS negatif (-0.27), mendekati 52W low ¥5.42 (hanya +6.2%). Hati-hati jika ingin bermitra strategis.
+                </div>
+
+                <div class="stat-block">
+                    <strong>📅 Dragon Boat Festival:</strong> Pasar China tutup 23-28 Juni. Data ekuitas berikutnya: 29 Juni 2026. Harga fisik pestisida tetap aktif selama libur.
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SECTION 10: REGISTRATION & POLICY ===== -->
+        <div id="policy" class="section">
+            <div class="card">
+                <div class="card-header"><div class="card-title"><span class="card-icon">🏛️</span>2026 Registration Milestones & Policy</div></div>
+                
+                <div class="alert alert-success">
+                    <strong>Industri Snapshot:</strong> >¥300 Miliar (~$41.67B) total penjualan industri agrokimia China (2025). Batch ke-5 (Juni 2026): 653 registrasi pestisida baru. SACA 2026 (Jun 18): ~2,000 profesional, 250 exhibitor. CPEW 2026: China memamerkan senyawa CP proprietary baru.
+                </div>
+
+                <div class="grid-2">
+                    <div class="risk-item risk-medium">
+                        <div class="risk-title" style="margin-bottom:0.5rem;">🆕 Jiangsu Heben — Difenoconazole Brazil Registration</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                            Jiangsu Heben Biochemical memperoleh registrasi mandiri Difenoconazole Technical dari MAPA Brazil (TC12626). Terintegrasi vertikal dengan 1,3-dichlorobenzene. Juga memegang registrasi EU untuk hexythiazox, propamocarb HCl, clomazone, metalaxyl-M, propiconazole. Tiga basis produksi: Zhejiang, Jiangsu, Sichuan. Konfirmasi tren: produsen China membangun saluran distribusi sendiri = daya tawar harga lebih besar.
+                        </div>
+                    </div>
+
+                    <div class="risk-item risk-medium">
+                        <div class="risk-title" style="margin-bottom:0.5rem;">🆕 FMC-Corteva Rimisoxafen Co-Exclusive Deal</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                            FMC-Corteva menandatangani perjanjian suplai strategis rimisoxafen (herbisida dual MOA pertama industri). Pembayaran awal $200M. Komersialisasi akhir 2026. Berpotensi mengurangi permintaan herbisida asal China di Amerika (glyphosate). Ancaman jangka menengah untuk ekspor herbisida China — pantau volume peluncuran komersial.
+                        </div>
+                    </div>
+
+                    <div class="risk-item risk-medium">
+                        <div class="risk-title" style="margin-bottom:0.5rem;">🆕 SACA 2026 — Off-Patent Wave Confirmed</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                            Konfirmasi gelombang off-patent: CTPR, cyantraniliprole, sulfoxaflor. $170B tarif berpotensi refund 7% interest (keputusan pengadilan AS). Section 301 investigations. 2,4-D dumping case >150% combined duties. Agenda demographic trends membentuk permintaan jangka panjang.
+                        </div>
+                    </div>
+
+                    <div class="risk-item risk-medium">
+                        <div class="risk-title" style="margin-bottom:0.5rem;">🆕 CPEW 2026 — China Innovation Showcase</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                            China transisi dari manufaktur generik ke inovasi crop protection proprietary. Senyawa CP baru China dapat memerintahkan harga premium. Membangun competitive moat jangka panjang. Melengkapi gelombang off-patent: molekul lama menjadi generik, yang baru sedang dikembangkan.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-header" style="margin-top: 1.5rem;"><div class="card-title">Structural Industry Trends (from CCIPIA + SACA 2026)</div></div>
+                <div class="stat-block">
+                    <strong>1. Kapasitas Tidak Akan Turun:</strong> Meskipun ada keluhan "involution" (persaingan tidak sehat internal), produsen besar China diproyeksikan **TIDAK** akan memangkas kapasitas pabrik secara signifikan di 2026. SACA 2026 mengkonfirmasi overcapacity struktural.
+                </div>
+                <div class="stat-block">
+                    <strong>2. Intermediate Dependency:</strong> Bahkan sourcing dari India tidak sepenuhnya menghilangkan risiko China — industri India bergantung pada intermediate dan bahan baku China (confirmed by Diego Taube/Chempro SA).
+                </div>
+                <div class="stat-block">
+                    <strong>3. Packaging Cost Pressure:</strong> Kenaikan minyak bumi meningkatkan biaya kemasan plastik — margin pressure tambahan yang belum sepenuhnya tercermin di harga TC. Perpanjang lead time 30 hari, advance purchase 90 hari (Daniel Traverso/Anasac).
+                </div>
+            </div>
+        </div>
+
+
+    <!-- AUTO-GENERATED STATUS UPDATE: 22 Juni 2026 -->
+    <div id="status-update" class="card" style="margin-top: 2rem;">
+        <div class="card-header">
+            <div class="card-title"><span class="card-icon">📡</span>Status Update — 22 Juni 2026</div>
+        </div>
+        <div class="stats">
+  <p><strong>Report Date:</strong> 22 Juni 2026 | <strong>Exchange Rate:</strong> 6.79 | <strong>WTI:</strong> $76.54 | <strong>VIX:</strong> 16.78</p>
+</div>
+    </div>
+        </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <div class="header-content">
+            <div class="footer-text">
+                <strong>China Agricultural Chemical Pricing Intelligence Dashboard</strong> — Enterprise v2.4
+            </div>
+            <div class="footer-text">
+                Data Update: 22 Juni 2026| Exchange Rate: 1 USD = 6.79 CNY | WTI Crude: $76.54/bbl | VIX: 16.78
+            </div>
+            <div class="footer-text" style="margin-top: 1rem; opacity: 0.8; font-size: 0.85rem;">
+                © 2026 Genesis Market Research | Sources: CCPIA CAPI, ABG Reports, Yahoo Finance, Exchange-Rate API, SACA 2026, CPEW 2026
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        function switchSection(sectionId, tabElement) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            document.getElementById(sectionId).classList.add('active');
+
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            tabElement.classList.add('active');
+
+            // Scroll adjustment for sticky header
+            const headerHeight = document.querySelector('.header').offsetHeight;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function filterTable(tableId, searchInputId) {
+            const input = document.getElementById(searchInputId);
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById(tableId);
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let found = false;
+                for (let j = 0; j < cells.length; j++) {
+                    if (cells[j] && cells[j].textContent.toUpperCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+                rows[i].style.display = found ? '' : 'none';
+            }
+        }
+
+        function filterTrend(tableId, trend) {
+            const table = document.getElementById(tableId);
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const trendCell = rows[i].getElementsByTagName('td')[5];
+                if (!trendCell) continue;
+                
+                let display = true;
+                if (trend === 'up' && !trendCell.textContent.includes('⬆️')) display = false;
+                else if (trend === 'down' && !trendCell.textContent.includes('⬇️')) display = false;
+                else if (trend === 'stable' && !trendCell.textContent.includes('→')) display = false;
+
+                rows[i].style.display = display ? '' : 'none';
+            }
+        }
+        
+        // Ensure sticky header height is calculated correctly for tabs
+        window.addEventListener('resize', () => {
+             const headerHeight = document.querySelector('.header').offsetHeight;
+             document.documentElement.style.setProperty('--header-height', `${headerHeight}px`);
+        });
+        window.dispatchEvent(new Event('resize'));
+    </script>
+</body>
+</html>
